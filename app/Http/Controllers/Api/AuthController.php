@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use Illuminate\Container\Attributes\Auth;
+use Illuminate\Foundation\Auth;
+
 
 class AuthController extends Controller
 {
@@ -46,7 +47,9 @@ class AuthController extends Controller
 
     public function Logout()
     {
-        auth('sanctum')->user()->currentAccessToken()->delete();
+
+        $token = auth('sanctum')->user()->currentAccessToken();
+        $token->delete();
         return response()->json([
             'message' => 'User Loggedout successfully',
         ], 200);
