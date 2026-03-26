@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Board\StoreBoardRequest;
 use App\Http\Requests\Board\UpdateBoardRequest;
 use App\Models\Board;
+use App\Models\BoardMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BoardController extends Controller
 {
@@ -36,18 +38,38 @@ class BoardController extends Controller
      */
     public function store(StoreBoardRequest $request)
     {
-        $board = Board::create([
-            'owner_id' => auth('sanctum')->id(),
-            'name' => $request->name,
-            'description' => $request->description,
-            'is_private' => $request->is_private ?? false
-        ]);
+        DB::beginTransaction();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Board Created Successfully',
-            'board' => $board->load('owner')
-        ], 201);
+        try {
+            $board = Board::create([
+                'owner_id' => auth('sanctum')->id(),
+                'name' => $request->name,
+                'description' => $request->description,
+                'is_private' => $request->is_private ?? false
+            ]);
+
+            $boardMember = BoardMember::create([
+                'board_id' => $board->id,
+                'user_id' => auth('sanctum')->id(),
+                'role' => 'manager',
+            ]);
+
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => 'Board Created Successfully',
+                'board' => $board->load('owner'),
+                'members' => $boardMember->user->name,
+            ], 201);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong',
+            ], 500);
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Board;
 use App\Policies\BoardPolicy;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
