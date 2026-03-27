@@ -17,6 +17,7 @@ class BoardController extends Controller
      */
     public function index()
     {
+
         $board = Board::get();
 
         return response()->json([
@@ -77,6 +78,8 @@ class BoardController extends Controller
      */
     public function show(Board $board)
     {
+
+        $this->authorize('viewBoard', $board);
         return response()->json([
             'messages' => 'Listed a board',
             'board' => $board->load('owner')
@@ -96,6 +99,8 @@ class BoardController extends Controller
      */
     public function update(UpdateBoardRequest $request, Board $board)
     {
+        $this->authorize('updateBoard', $board);
+
         $board->update($request->validated());
 
         return response()->json([
@@ -109,6 +114,7 @@ class BoardController extends Controller
      */
     public function destroy(Board $board)
     {
+        $this->authorize('deleteBoard', $board);
         $board->delete();
 
         return response()->json([

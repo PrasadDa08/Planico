@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreMemberRequest;
 use App\Models\BoardMember;
 use App\Models\Board;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class BoardMemberController extends Controller
@@ -12,8 +13,10 @@ class BoardMemberController extends Controller
     /**
      * Display a listing of the resource.
      */
+
     public function index(Board $board)
     {
+        $this->authorize('viewMembers', $board);
         $members = BoardMember::where('board_id', $board->id)->with('user')->get();
 
         return response()->json([
@@ -36,17 +39,26 @@ class BoardMemberController extends Controller
      */
     public function store(StoreMemberRequest $request, Board $board)
     {
-        $member =BoardMember::create([
-            'board_id' => $board->id,
-            'user_id' => $request->user_id,
-            'role' => $request->role ?? 'member',
-        ]);
+        $this->authorize('inviteMember', $board);
+        $user = User::where('id', $request->user_id)->exists();
+        if ($user) {
+            $member = BoardMember::create([
+                'board_id' => $board->id,
+                'user_id' => $request->user_id,
+                'role' => $request->role ?? 'member',
+            ]);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Board member added successfully',
-            'data' => $member->load('board')
-        ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Board member added successfully',
+                'data' => $member->load('board')
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "User dosen't exists",
+            ]);
+        }
     }
 
     /**
@@ -54,6 +66,7 @@ class BoardMemberController extends Controller
      */
     public function show(Board $board, BoardMember $member)
     {
+        $this->authorize('view', $board);
         return response()->json([
             'status' => true,
             'message' => 'Boardmember listed here',
@@ -74,6 +87,7 @@ class BoardMemberController extends Controller
      */
     public function update(Request $request, Board $board, BoardMember $member)
     {
+        $this->authorize('updateMemberRole', $board);
         $member->update([
             'role' => $request->role,
         ]);
@@ -90,6 +104,7 @@ class BoardMemberController extends Controller
      */
     public function destroy(Board $board, BoardMember $member)
     {
+        $this->authorize('deleteMember', $board);
         $member->delete();
 
         return response()->json([
