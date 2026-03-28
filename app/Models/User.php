@@ -31,11 +31,23 @@ class User extends Authenticatable
         ];
     }
 
-    public function board(){
-        return $this->hasMany(Board::class);
+    public function boards(){
+        return $this->hasMany(Board::class, 'owner_id');
     }
 
     public function boardMember(){
         return $this->hasMany(BoardMember::class);
+    }
+
+    public function assignedTasks(){
+        return $this->hasMany(Task::class, 'assigned_to');
+    }
+
+    public function createdTasks(){
+        return $this->hasMany(Task::class, 'created_by');
+    }
+
+    public function comments(){
+        return $this->hasMany(Comment::class);
     }
 }

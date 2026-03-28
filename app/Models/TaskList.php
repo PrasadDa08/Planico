@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Board;
+use App\Models\Task;
 
 class TaskList extends Model
 {
@@ -17,5 +18,9 @@ class TaskList extends Model
 
     public function board(){
         return $this->belongsTo(Board::class);
+    }
+
+    public function tasks(){
+        return $this->hasMany(Task::class);
     }
 }

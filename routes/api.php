@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\BoardMemberController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskListController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,4 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('boards', BoardController::class);
     Route::apiResource('boards.members', BoardMemberController::class);
     Route::apiResource('boards.lists', TaskListController::class);
+    Route::apiResource('boards.lists.tasks', TaskController::class);
+    Route::get('/boardtasks/{board}', [TaskController::class, 'boardTasks']);
+    Route::apiResource('boards.lists.tasks.comments', CommentController::class);
 });
+
