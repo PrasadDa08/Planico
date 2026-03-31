@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreListRequest;
 use App\Models\Board;
 use App\Models\TaskList;
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 
 class TaskListController extends Controller
@@ -38,22 +39,30 @@ class TaskListController extends Controller
     public function store(StoreListRequest $request, Board $board)
     {
         $this->authorize('addList', $board);
-        TaskList::create([
+        $list = TaskList::create([
             'board_id' => $board->id,
             'name' => $request->name,
             'position' => $request->position
         ]);
 
+        ActivityService::log(
+            boardId: $board->id,
+            action: $list->name . '_list_created',
+            subjectModel: 'TaskList',
+            subjectId: $board->id,
+        );
+
         return response()->json([
             'status' => true,
-            'message' => 'Task List added successfully'
+            'message' => 'Task List added successfully',
+            'data' => $list
         ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Board $board,TaskList $list)
+    public function show(Board $board, TaskList $list)
     {
         $this->authorize('viewList', $board);
         return response()->json([
@@ -82,6 +91,13 @@ class TaskListController extends Controller
             'position' => $request->position
         ]);
 
+        ActivityService::log(
+            boardId: $board->id,
+            action: $list->name . '_list_updated',
+            subjectModel: 'TaskList',
+            subjectId: $board->id,
+        );
+
         return response()->json([
             'status' => true,
             'message' => 'List updated successfully'
@@ -95,6 +111,13 @@ class TaskListController extends Controller
     {
         $this->authorize('deleteList', $board);
         $list->delete();
+
+        ActivityService::log(
+            boardId: $board->id,
+            action: $list->name . '_list_deleted',
+            subjectModel: 'TaskList',
+            subjectId: $board->id,
+        );
 
         return response()->json([
             'status' => true,

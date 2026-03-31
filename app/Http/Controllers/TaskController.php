@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use App\Models\TaskList;
 use App\Models\Board;
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -52,6 +53,14 @@ class TaskController extends Controller
             'position' => $request->position
         ]);
 
+        ActivityService::log(
+            boardId: $board->id,
+            taskId: $task->id,
+            action: 'task_added',
+            subjectModel: 'Task',
+            subjectId: $task->id
+        );
+
         return response()->json([
             'status' => true,
             'message' => 'Task added successfully',
@@ -89,6 +98,14 @@ class TaskController extends Controller
         $this->authorize('updateTask', $board);
         $task->update($request->validated());
 
+        ActivityService::log(
+            boardId: $board->id,
+            taskId: $task->id,
+            action: 'task_updated',
+            subjectModel: 'Task',
+            subjectId: $task->id
+        );
+
         return response()->json([
             'status' => true,
             'message' => 'Task updated successfuly',
@@ -102,7 +119,17 @@ class TaskController extends Controller
     public function destroy(Board $board, TaskList $list, Task $task)
     {
         $this->authorize('deleteTask', $board);
+        
+        ActivityService::log(
+            boardId: $board->id,
+            taskId: $task->id,
+            action: 'task_deleted',
+            subjectModel: 'Task',
+            subjectId: $task->id
+        );
+
         $task->delete();
+
 
         return response()->json([
             'status' => true,

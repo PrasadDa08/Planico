@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMemberRequest;
+use App\Models\ActivityLog;
 use App\Models\BoardMember;
 use App\Models\Board;
 use App\Models\User;
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 
 class BoardMemberController extends Controller
@@ -47,6 +49,14 @@ class BoardMemberController extends Controller
                 'user_id' => $request->user_id,
                 'role' => $request->role ?? 'member',
             ]);
+
+            ActivityService::log(
+                boardId: $board->id,
+                action: $member->user->name . '_added',
+                subjectModel: 'BoardMember',
+                subjectId: $board->id,
+                meta: ['role' => $member->role]
+            );
 
             return response()->json([
                 'status' => true,
@@ -92,6 +102,14 @@ class BoardMemberController extends Controller
             'role' => $request->role,
         ]);
 
+        ActivityService::log(
+            boardId: $board->id,
+            action: $member-> user-> name . '_updated',
+            subjectModel: 'BoardMember',
+            subjectId: $board->id,
+            meta: ['role' => $member->role]
+        );
+
         return response()->json([
             'status' => true,
             'message' => 'Member updated successfully',
@@ -105,7 +123,15 @@ class BoardMemberController extends Controller
     public function destroy(Board $board, BoardMember $member)
     {
         $this->authorize('deleteMember', $board);
+        $name = $member->name;
         $member->delete();
+
+        ActivityService::log(
+            boardId: $board->id,
+            action: 'member_' . $name . '_deleted',
+            subjectModel: 'BoardMember',
+            subjectId: $board->id,
+        );
 
         return response()->json([
             'status' => true,

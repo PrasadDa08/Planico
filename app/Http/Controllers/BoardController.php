@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Board\StoreBoardRequest;
 use App\Http\Requests\Board\UpdateBoardRequest;
+use App\Models\ActivityLog;
 use App\Models\Board;
 use App\Models\BoardMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\ActivityService;
 
 class BoardController extends Controller
 {
@@ -55,7 +57,15 @@ class BoardController extends Controller
                 'role' => 'manager',
             ]);
 
+            ActivityService::log(
+                boardId: $board->id,
+                action: 'board_created_owner_added',
+                subjectModel: 'BoardMember',
+                subjectId: $boardMember->id
+            );
+
             DB::commit();
+
             return response()->json([
                 'status' => true,
                 'message' => 'Board Created Successfully',
@@ -69,6 +79,7 @@ class BoardController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Something went wrong',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -102,6 +113,13 @@ class BoardController extends Controller
         $this->authorize('updateBoard', $board);
 
         $board->update($request->validated());
+
+        ActivityService::log(
+            boardId: $board->id,
+            action: 'board_updated',
+            subjectModel: 'BoardMember',
+            subjectId: $board->id
+        );
 
         return response()->json([
             'status' => 'success',

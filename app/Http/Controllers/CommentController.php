@@ -6,7 +6,7 @@ use App\Models\Comment;
 use App\Models\Board;
 use App\Models\TaskList;
 use App\Models\Task;
-
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 
 
@@ -51,6 +51,15 @@ class CommentController extends Controller
             'body' => $request->body
         ]);
 
+        ActivityService::log(
+            boardId : $board->id,
+            taskId : $task->id,
+            action : 'comment_add_on_task'. $comment->task->name,
+            subjectModel: 'Comment',
+            subjectId: $comment->id,
+            meta : ['body' => $comment->body]
+        );
+
         return response()->json([
             'status' => true,
             'message' => 'Comment added successfully',
@@ -94,6 +103,15 @@ class CommentController extends Controller
             'body' => $request->body
         ]);
 
+         ActivityService::log(
+            boardId : $board->id,
+            taskId : $task->id,
+            action : 'comment_updated_on_task'. $comment->task->name,
+            subjectModel: 'Comment',
+            subjectId: $comment->id,
+            meta : ['body' => $comment->body]
+        );
+
         return response()->json([
             'status' => true,
             'message' => 'Comment updated successfully',
@@ -108,6 +126,14 @@ class CommentController extends Controller
     {
         $this->authorize('deleteComment', [$board, $comment]);
         $comment->delete();
+
+         ActivityService::log(
+            boardId : $board->id,
+            taskId : $task->id,
+            action : 'comment_deleted_on_task'. $comment->task->name,
+            subjectModel: 'Comment',
+            subjectId: $comment->id,
+        );
 
         return response()->json([
             'status' => true,
