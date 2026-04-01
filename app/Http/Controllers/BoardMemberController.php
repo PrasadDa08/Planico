@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMemberRequest;
+use App\Http\Resources\BoardMemberResource;
 use App\Models\ActivityLog;
 use App\Models\BoardMember;
 use App\Models\Board;
@@ -19,12 +20,12 @@ class BoardMemberController extends Controller
     public function index(Board $board)
     {
         $this->authorize('viewMembers', $board);
-        $members = BoardMember::where('board_id', $board->id)->with('user')->get();
+        $members = BoardMember::where('board_id', $board->id)->get();
 
         return response()->json([
             'status' => true,
             'message' => 'listed all members',
-            'members' => $members->load('user')
+            'data' => BoardMemberResource::collection($members->load('user'))
         ]);
     }
 
@@ -61,7 +62,7 @@ class BoardMemberController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Board member added successfully',
-                'data' => $member->load('board')
+                'data' => new BoardMemberResource($member->load('user'))
             ]);
         } else {
             return response()->json([
@@ -80,7 +81,7 @@ class BoardMemberController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Boardmember listed here',
-            'member' => $member->load('board')
+            'member' => new BoardMemberResource($member->load('user'))
         ]);
     }
 
@@ -113,7 +114,7 @@ class BoardMemberController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Member updated successfully',
-            'member' => $member
+            'data' => new BoardMemberResource($member->fresh()->load('user'))
         ]);
     }
 

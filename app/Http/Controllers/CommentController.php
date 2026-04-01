@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CommentResource;
 use App\Models\Comment;
 use App\Models\Board;
 use App\Models\TaskList;
@@ -23,7 +24,7 @@ class CommentController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'All comments for this task are listed here',
-            'data' => $comments
+            'data' => CommentResource::collection($comments->load('user', 'task'))
         ]);
     }
 
@@ -63,7 +64,7 @@ class CommentController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Comment added successfully',
-            'data' => $comment
+            'data' => new CommentResource($comment->load('user', 'task'))
         ]);
     }
 
@@ -76,7 +77,7 @@ class CommentController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Commnt is listed here',
-            'data' => $comment->load('user')
+            'data' => new CommentResource($comment->load('user', 'task'))
         ]);
 
     }
@@ -115,7 +116,7 @@ class CommentController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Comment updated successfully',
-            'data' => $comment->fresh()->load('task', 'user')
+            'data' => new CommentResource($comment->fresh()->load('task', 'user'))
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
@@ -13,7 +14,7 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password)
@@ -21,7 +22,8 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'User Registered Successfully'
+            'message' => 'User Registered Successfully',
+            'data' => new UserResource($user)
         ], 201);
     }
 
@@ -41,15 +43,20 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'User Logged In Successfully',
-            'token' => $token
+            'token' => $token,
+            'data' => new UserResource($user)
         ], 200);
     }
 
-    public function Logout()
+    public function Logout(Request $request)
     {
 
-        $token = auth('sanctum')->user()->currentAccessToken();
+        // $token = auth('sanctum')->user()->currentAccessToken();
+        // $token->delete();
+         /** @var \Laravel\Sanctum\PersonalAccessToken|null $token */
+        $token = $request->user()->currentAccessToken();
         $token->delete();
+        
         return response()->json([
             'message' => 'User Loggedout successfully',
         ], 200);

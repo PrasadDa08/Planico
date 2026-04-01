@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use App\Models\TaskList;
 use App\Models\Board;
@@ -18,12 +19,12 @@ class TaskController extends Controller
     public function index(Board $board, TaskList $list)
     {
         $this->authorize('viewTask', $board);
-        $tasks = Task::get();
+        $tasks = Task::where('board_id', $board->id)->where('list_id', $list->id)->get();
 
         return response()->json([
             'status' => true,
             'message' => 'below are all tasks of list :' . $list->name,
-            'data' => $tasks
+            'data' => TaskResource::collection($tasks->load('createdBy', 'assignedTo'))
         ]);
     }
 
@@ -64,7 +65,7 @@ class TaskController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Task added successfully',
-            'data' => $task->load('list', 'board')
+            'data' => new TaskResource($task->load('createdBy', 'assignedTo'))
         ], 201);
     }
 
@@ -78,7 +79,7 @@ class TaskController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'your task listed here',
-            'data' => $task
+            'data' => new TaskResource($task->load('createdBy', 'assignedTo'))
         ]);
     }
 
@@ -109,7 +110,7 @@ class TaskController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Task updated successfuly',
-            'data' => $task->fresh()
+            'data' => new TaskResource($task->fresh()->load('createdBy', 'assignedTo'))
         ]);
     }
 
@@ -119,7 +120,7 @@ class TaskController extends Controller
     public function destroy(Board $board, TaskList $list, Task $task)
     {
         $this->authorize('deleteTask', $board);
-        
+
         ActivityService::log(
             boardId: $board->id,
             taskId: $task->id,
@@ -146,7 +147,7 @@ class TaskController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'All tasks for Board : ' . $board->name,
-            'data' => $tasks->load('assignedTo', 'createdBy')
+            'data' => TaskResource::collection($tasks)
         ]);
     }
 }

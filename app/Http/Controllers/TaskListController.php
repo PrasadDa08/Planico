@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreListRequest;
+use App\Http\Resources\TaskListResource;
 use App\Models\Board;
 use App\Models\TaskList;
 use App\Services\ActivityService;
@@ -21,7 +22,7 @@ class TaskListController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'All Lists for board : ' . $board->name,
-            'data' => $lists
+            'data' => TaskListResource::collection($lists->load('board'))
         ], 200);
     }
 
@@ -55,7 +56,7 @@ class TaskListController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Task List added successfully',
-            'data' => $list
+            'data' => new TaskListResource($list)
         ], 201);
     }
 
@@ -68,7 +69,7 @@ class TaskListController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'list is shown below',
-            'list' => $list
+            'list' => new TaskListResource($list)
         ], 200);
     }
 
@@ -100,7 +101,8 @@ class TaskListController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'List updated successfully'
+            'message' => 'List updated successfully',
+            'data' => new TaskListResource($list->fresh())
         ]);
     }
 

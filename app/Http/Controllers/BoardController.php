@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Board\StoreBoardRequest;
 use App\Http\Requests\Board\UpdateBoardRequest;
+use App\Http\Resources\BoardResource;
 use App\Models\ActivityLog;
 use App\Models\Board;
 use App\Models\BoardMember;
@@ -20,11 +21,12 @@ class BoardController extends Controller
     public function index()
     {
 
-        $board = Board::get();
+        $boards = Board::Where('owner_id', auth('sanctum')->id())->get();
 
         return response()->json([
+            'status' => true,
             'message' => 'Listed all boards',
-            'boards' => $board->load('owner'),
+            'data' => BoardResource::collection($boards->load('owner', 'members')),
         ]);
     }
 
@@ -69,8 +71,7 @@ class BoardController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Board Created Successfully',
-                'board' => $board->load('owner'),
-                'members' => $boardMember->user->name,
+                'data' => new BoardResource($board->load('owner', 'members')),
             ], 201);
         } catch (\Exception $e) {
 
@@ -92,8 +93,10 @@ class BoardController extends Controller
 
         $this->authorize('viewBoard', $board);
         return response()->json([
+            'status' => true,
             'messages' => 'Listed a board',
-            'board' => $board->load('owner')
+            'data' => new BoardResource($board->load('owner', 'members')),
+            'members_count' => $board->members->count()
         ]);
     }
 
@@ -122,8 +125,9 @@ class BoardController extends Controller
         );
 
         return response()->json([
-            'status' => 'success',
+            'status' => true,
             'message' => 'Board details updated successfully',
+            'data' => new BoardResource($board->fresh()->load('owner', 'members'))
         ]);
     }
 
@@ -136,7 +140,7 @@ class BoardController extends Controller
         $board->delete();
 
         return response()->json([
-            'status' => 'success',
+            'status' => true,
             'message' => 'Board Deleted Successfully',
         ]);
     }

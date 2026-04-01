@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\BoardMemberController;
@@ -26,5 +27,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('boards.lists.tasks', TaskController::class);
     Route::get('/boardtasks/{board}', [TaskController::class, 'boardTasks']);
     Route::apiResource('boards.lists.tasks.comments', CommentController::class);
+    Route::get('/logs', [ActivityLogController::class, 'logs']);
 });
 
