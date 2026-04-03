@@ -32,7 +32,7 @@ class BoardPolicy
 
     // Policies for Member
     public function inviteMember(User $user, Board $board){
-        return $board->members()->where('user_id', $user->id)->whereIn('role', ['manager', 'team_lead'])->exists();
+        return $board->members()->where('user_id', $user->id)->whereIn('role', ['manager'])->exists();
     }
 
     public function updateMemberRole(User $user, Board $board){
@@ -44,7 +44,7 @@ class BoardPolicy
     }
 
     public function deleteMember(User $user, Board $board){
-        return $board->members()->where('user_id', $user->id)->whereIn('role', ['manager', 'team_lead'])->exists();
+        return $board->members()->where('user_id', $user->id)->whereIn('role', ['manager'])->exists();
     }
 
     // Policies for List

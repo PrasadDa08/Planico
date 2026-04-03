@@ -1,0 +1,1370 @@
+{
+  "info": {
+    "_postman_id": "78ac65f8-aa97-467a-a165-047a15f21930",
+    "name": "Planico API",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53440734",
+    "_collection_link": "https://go.postman.co/collection/53440734-78ac65f8-aa97-467a-a165-047a15f21930?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Successful POST request\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"PrasadD\",\n    \"email\": \"prasadD@123\",\n    \"password\": 12345\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "## Register a New User\n\nRegisters a new user account in the system.\n\n**Method:** `POST`  \n**URL:** `{{base_url}}/register`\n\n---\n\n### Request Body\n\nThe request body should be sent as **raw JSON** with the following fields:\n\n| Field | Type | **Required** | Description | **Rules** |\n| --- | --- | --- | --- | --- |\n| `name` | string | Yes | The display name of the new user | Min 2 chars, Max 255 chars |\n| `email` | string | Yes | The email address of the new user | Valid email, Must be unique |\n| `password` | string | Yes | The password for the new account | Min 8 characters |\n\n**Example:**\n\n``` json\n{\n  \"name\": \"PrasadD\",\n  \"email\": \"prasadD@example.com\",\n  \"password\": \"password123\"\n}\n\n ```\n\n---\n\n### Response\n\n| Status Code | Description |\n| --- | --- |\n| `201 Created` | User created successfully |\n\nA successful response will return a `200` or `201` status code indicating the user has been registered.\n\n### EXAMPLE RESPONSE (201):\n\n``` json\n    \"status\": true,\n    \"message\": \"User registered successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Prasad Datir\",\n        \"email\": \"prasad@example.com\"\n    }\n}\n\n ```\n\n### ERROR RESPONSES:\n\n| **Status Code** | **Description** |\n| --- | --- |\n| 422 | Validation failed (invalid email, weak password etc) |\n| 500 | Server error |"
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "pm.environment.set(\"token\", response.token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"prasadD@123\",\n    \"password\": 12345\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "# 🔐 Login\n\nAuthenticates a registered user and returns a Sanctum access token.\n\n---\n\n## 📌 Endpoint\n\n| Method | URL |\n| --- | --- |\n| `POST` | `{{base_url}}/login` |\n\n---\n\n## 📥 Request Body\n\n> Content-Type: `application/json` \n  \n\n| Field | Type | Required | Description |\n| --- | --- | --- | --- |\n| `email` | string | ✅ Yes | Registered email address |\n| `password` | string | ✅ Yes | Account password (min 8 chars) |\n\n### Example Request\n\n``` json\n{\n    \"email\": \"prasad@example.com\",\n    \"password\": \"password123\"\n}\n\n ```\n\n---\n\n## 📤 Response\n\n### ✅ Success (200 OK)\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"User logged in successfully\",\n    \"token\": \"1|laravel_sanctum_token_here\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Prasad Datir\",\n        \"email\": \"prasad@example.com\"\n    }\n}\n\n ```\n\n---\n\n## ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Invalid credentials |\n| `422` | Validation failed |\n| `500` | Server error |\n\n### 422 Validation Error Example\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed\",\n    \"errors\": {\n        \"email\": [\"The email field is required.\"],\n        \"password\": [\"The password field is required.\"]\n    }\n}\n\n ```\n\n### 401 Unauthorized Example\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Invalid credentials\"\n}\n\n ```\n\n---\n\n## 🔑 Auto Token Script\n\nAfter a successful login the **Tests** tab script automatically  \nextracts the token from the response and saves it to the  \n`{{token}}` environment variable.\n\nThis token is then automatically used in all subsequent  \nauthenticated requests via the collection-level Bearer Token auth.\n\n``` javascript\nconst response = pm.response.json();\nif (response.token) {\n    pm.environment.set(\"token\", response.token);\n    console.log(\"✅ Token saved: \" + response.token);\n}\n\n ```\n\n---\n\n## 📝 Notes\n\n- Token expires when user logs out\n    \n- Include token in all authenticated requests as `Bearer {{token}}`\n    \n- Each login generates a new token"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/logout",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "logout"
+              ]
+            },
+            "description": "## 🔓 Logout\n\nInvalidates the authenticated user's current access token and ends the session.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `POST` | `{{base_url}}/logout` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Logged out successfully.\",\n    \"data\": null\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- This endpoint uses Laravel Sanctum's `currentAccessToken()->delete()` to revoke only the current token.\n    \n- After logout, the token is immediately invalidated and cannot be reused.\n    \n- To fully log out from all devices, a separate \"logout from all devices\" endpoint would be needed."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Board",
+      "item": [
+        {
+          "name": "Update Board",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\" : \"Updated Board2\",\n    \"description\" : \"This for checking activity logs\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}"
+              ]
+            },
+            "description": "## ✏️ Update Board\n\nUpdates the details of an existing board. Only the board creator or a `manager` can update a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `PUT` | `{{base_url}}/boards/{{board_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**Required Role:** `manager`\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board to update |\n\n---\n\n### Request Body\n\n| Field | Type | Required | Description | Validation Rules |\n| --- | --- | --- | --- | --- |\n| `name` | string | ✅ Yes | The updated name of the board | `required`, `string`, `max:255` |\n| `description` | string | ❌ No | Updated description of the board | `nullable`, `string` |\n\n**Example Request Body:**\n\n``` json\n{\n    \"name\": \"Product Launch Q3 - Updated\",\n    \"description\": \"Updated board for tracking Q3 product launch tasks and milestones.\"\n}\n\n ```\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Board updated successfully.\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Product Launch Q3 - Updated\",\n        \"description\": \"Updated board for tracking Q3 product launch tasks and milestones.\",\n        \"created_by\": 3,\n        \"created_at\": \"2025-07-15T09:30:00.000000Z\",\n        \"updated_at\": \"2025-07-15T11:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user does not have the `manager` role |\n| `404` | Board not found |\n| `422` | Validation error — required fields missing or invalid |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to perform this action.\",\n    \"errors\": {}\n}\n\n ```\n\n**422 Validation Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed.\",\n    \"errors\": {\n        \"name\": [\"The name field is required.\"]\n    }\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Only the board's creator or a user with the `manager` role can update the board.\n    \n- Partial updates are not supported — provide all required fields.\n    \n- The `updated_at` timestamp is automatically refreshed on every update."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Board",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\" : \"Activity Log checks\",\n    \"description\" : \"All Backend related task are listed here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards"
+              ]
+            },
+            "description": "## 📋 Create Board\n\nCreates a new board for the authenticated user.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `POST` | `{{base_url}}/boards` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### Request Body\n\n| Field | Type | Required | Description | Validation Rules |\n| --- | --- | --- | --- | --- |\n| `name` | string | ✅ Yes | The name of the board | `required`, `string`, `max:255` |\n| `description` | string | ❌ No | A brief description of the board | `nullable`, `string` |\n\n**Example Request Body:**\n\n``` json\n{\n    \"name\": \"Product Launch Q3\",\n    \"description\": \"Board for tracking all tasks related to the Q3 product launch campaign.\"\n}\n\n ```\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `201 Created`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Board created successfully.\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Product Launch Q3\",\n        \"description\": \"Board for tracking all tasks related to the Q3 product launch campaign.\",\n        \"created_by\": 3,\n        \"created_at\": \"2025-07-15T09:30:00.000000Z\",\n        \"updated_at\": \"2025-07-15T09:30:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `422` | Validation error — required fields missing or invalid |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**422 Validation Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed.\",\n    \"errors\": {\n        \"name\": [\"The name field is required.\"]\n    }\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- The `created_by` field is automatically set to the authenticated user's ID.\n    \n- Board names should be unique per user to avoid confusion.\n    \n- The authenticated user gets added as a board member with role manager."
+          },
+          "response": []
+        },
+        {
+          "name": "All Boards",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/boards",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards"
+              ]
+            },
+            "description": "## 📂 All Boards\n\nRetrieves a list of all boards accessible to the authenticated user.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boards` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Boards retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"name\": \"Product Launch Q3\",\n            \"description\": \"Board for tracking all tasks related to the Q3 product launch.\",\n            \"created_by\": 3,\n            \"created_at\": \"2025-07-15T09:30:00.000000Z\",\n            \"updated_at\": \"2025-07-15T09:30:00.000000Z\"\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Engineering Roadmap\",\n            \"description\": \"Tracks all engineering milestones for the current quarter.\",\n            \"created_by\": 3,\n            \"created_at\": \"2025-07-16T10:00:00.000000Z\",\n            \"updated_at\": \"2025-07-16T10:00:00.000000Z\"\n        }\n    ]\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns only boards that the authenticated user has access to (either as creator or member).\n    \n- Results may be paginated in production environments.\n    \n- An empty array `[]` is returned if no boards exist."
+          },
+          "response": []
+        },
+        {
+          "name": "Get A Board",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}"
+              ]
+            },
+            "description": "## 🔍 Get A Board\n\nRetrieves the details of a specific board by its ID.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boards/{{board_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board to retrieve |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Board retrieved successfully.\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Product Launch Q3\",\n        \"description\": \"Board for tracking all tasks related to the Q3 product launch.\",\n        \"created_by\": 3,\n        \"members\": [\n            {\n                \"id\": 5,\n                \"name\": \"Alice Johnson\",\n                \"email\": \"alice@example.com\",\n                \"role\": \"team_lead\"\n            }\n        ],\n        \"lists\": [\n            {\n                \"id\": 1,\n                \"name\": \"To Do\"\n            },\n            {\n                \"id\": 2,\n                \"name\": \"In Progress\"\n            }\n        ],\n        \"created_at\": \"2025-07-15T09:30:00.000000Z\",\n        \"updated_at\": \"2025-07-15T09:30:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `404` | Board not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view this board.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns full board details including members and lists.\n    \n- Only board members and the creator can view board details.\n    \n- The `board_id` environment variable should be set after creating or listing boards."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Board",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}"
+              ]
+            },
+            "description": "## 🗑️ Delete Board\n\nPermanently deletes a board and all its associated lists, tasks, and comments.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `DELETE` | `{{base_url}}/boards/{{board_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**Required Role:** `manager`\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board to delete |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `204 No Content`\n\n> No response body is returned on successful deletion. \n  \n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user does not have the `manager` role |\n| `404` | Board not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to delete this board.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- ⚠️ **This action is irreversible.** Deleting a board will cascade-delete all associated lists, tasks, comments, and activity logs.\n    \n- Only users with the `manager` role can delete boards.\n    \n- A `204 No Content` response with no body is returned on success."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Member",
+      "item": [
+        {
+          "name": "Add Member",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"user_id\" : 3,\n    \"role\" : \"member\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/members",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "members"
+              ]
+            },
+            "description": "## 👤 Add Member\n\nAdds a user as a member to a specific board with an assigned role.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `POST` | `{{base_url}}/boards/{{board_id}}/members` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**Required Role:** `manager`\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n\n---\n\n### Request Body\n\n| Field | Type | Required | Description | Validation Rules |\n| --- | --- | --- | --- | --- |\n| `user_id` | integer | ✅ Yes | The ID of the user to add | `required`, `integer`, `exists:users,id` |\n| `role` | string | ✅ Yes | The role to assign to the member | `required`, `in:manager,team_lead,member` |\n\n**Example Request Body:**\n\n``` json\n{\n    \"user_id\": 7,\n    \"role\": \"team_lead\"\n}\n\n ```\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `201 Created`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Member added successfully.\",\n    \"data\": {\n        \"id\": 12,\n        \"board_id\": 1,\n        \"user_id\": 7,\n        \"role\": \"team_lead\",\n        \"user\": {\n            \"id\": 7,\n            \"name\": \"Bob Martinez\",\n            \"email\": \"bob@example.com\"\n        },\n        \"created_at\": \"2025-07-15T10:00:00.000000Z\",\n        \"updated_at\": \"2025-07-15T10:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user does not have the `manager` role |\n| `422` | Validation error — invalid user ID or role |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to add members.\",\n    \"errors\": {}\n}\n\n ```\n\n**422 Validation Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed.\",\n    \"errors\": {\n        \"user_id\": [\"The selected user id is invalid.\"],\n        \"role\": [\"The selected role is invalid.\"]\n    }\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Valid roles are: `manager`, `team_lead`, `member`.\n    \n- A user can only be added to a board once. Attempting to add a duplicate member will return a validation error.\n    \n- Only users with the `manager` role can add members to a board."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Member",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"role\" : \"team_lead\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/members/{{member_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "members",
+                "{{member_id}}"
+              ]
+            },
+            "description": "## 🔄 Update Member\n\nUpdates the role of an existing board member.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `PUT` | `{{base_url}}/boards/{{board_id}}/members/{{member_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**Required Role:** `manager`\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `member_id` | integer | The unique ID of the board member record |\n\n---\n\n### Request Body\n\n| Field | Type | Required | Description | Validation Rules |\n| --- | --- | --- | --- | --- |\n| `role` | string | ✅ Yes | The new role to assign to the member | `required`, `in:manager,team_lead,member` |\n\n**Example Request Body:**\n\n``` json\n{\n    \"role\": \"member\"\n}\n\n ```\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Member updated successfully.\",\n    \"data\": {\n        \"id\": 12,\n        \"board_id\": 1,\n        \"user_id\": 7,\n        \"role\": \"member\",\n        \"user\": {\n            \"id\": 7,\n            \"name\": \"Bob Martinez\",\n            \"email\": \"bob@example.com\"\n        },\n        \"created_at\": \"2025-07-15T10:00:00.000000Z\",\n        \"updated_at\": \"2025-07-15T12:30:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user does not have the `manager` role |\n| `404` | Member not found on this board |\n| `422` | Validation error — invalid role value |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to update members.\",\n    \"errors\": {}\n}\n\n ```\n\n**422 Validation Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed.\",\n    \"errors\": {\n        \"role\": [\"The selected role is invalid.\"]\n    }\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Only the `role` field can be updated for a board member.\n    \n- Valid roles are: `manager`, `team_lead`, `member`.\n    \n- Only users with the `manager` role can update member roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Get A Member",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/members/{{member_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "members",
+                "{{member_id}}"
+              ]
+            },
+            "description": "## 👁️ Get A Member\n\nRetrieves the details of a specific member on a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boards/{{board_id}}/members/{{member_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `member_id` | integer | The unique ID of the board member record |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Member retrieved successfully.\",\n    \"data\": {\n        \"id\": 12,\n        \"board_id\": 1,\n        \"user_id\": 7,\n        \"role\": \"team_lead\",\n        \"user\": {\n            \"id\": 7,\n            \"name\": \"Bob Martinez\",\n            \"email\": \"bob@example.com\"\n        },\n        \"created_at\": \"2025-07-15T10:00:00.000000Z\",\n        \"updated_at\": \"2025-07-15T10:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `404` | Member not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view this member.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns the member's user details along with their assigned role on the board.\n    \n- Only board members can view other members' details."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Member",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/members/{{member_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "members",
+                "{{member_id}}"
+              ]
+            },
+            "description": "## 🚫 Delete Member\n\nRemoves a member from a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `DELETE` | `{{base_url}}/boards/{{board_id}}/members/{{member_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**Required Role:** `manager`\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `member_id` | integer | The unique ID of the board member record |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `204 No Content`\n\n> No response body is returned on successful deletion. \n  \n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user does not have the `manager` role |\n| `404` | Member not found on this board |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to remove members.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Removing a member does not delete their user account — it only removes their access to the board.\n    \n- Only users with the `manager` role can remove members.\n    \n- The board creator cannot be removed as a member."
+          },
+          "response": []
+        },
+        {
+          "name": "Gell All Members of Board",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/members",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "members"
+              ]
+            },
+            "description": "## 👥 Get All Members of Board\n\nRetrieves a list of all members belonging to a specific board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boards/{{board_id}}/members` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Members retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 10,\n            \"board_id\": 1,\n            \"user_id\": 3,\n            \"role\": \"manager\",\n            \"user\": {\n                \"id\": 3,\n                \"name\": \"Sarah Connor\",\n                \"email\": \"sarah@example.com\"\n            }\n        },\n        {\n            \"id\": 12,\n            \"board_id\": 1,\n            \"user_id\": 7,\n            \"role\": \"team_lead\",\n            \"user\": {\n                \"id\": 7,\n                \"name\": \"Bob Martinez\",\n                \"email\": \"bob@example.com\"\n            }\n        }\n    ]\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `404` | Board not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view this board's members.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns all members with their roles and user details.\n    \n- Only board members can view the member list.\n    \n- An empty array `[]` is returned if no members exist (unlikely in practice)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lists",
+      "item": [
+        {
+          "name": "Add List",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\" : \"In progress\",\n    \"position\" : 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists"
+              ]
+            },
+            "description": "## 📝 Add List\n\nCreates a new list within a specific board. Lists are used to organize tasks (e.g., \"To Do\", \"In Progress\", \"Done\").\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `POST` | `{{base_url}}/boards/{{board_id}}/lists` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**Required Role:** `manager` or `team_lead`\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n\n---\n\n### Request Body\n\n| Field | Type | Required | Description | Validation Rules |\n| --- | --- | --- | --- | --- |\n| `name` | string | ✅ Yes | The name of the list | `required`, `string`, `max:255` |\n\n**Example Request Body:**\n\n``` json\n{\n    \"name\": \"In Progress\"\n}\n\n ```\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `201 Created`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"List created successfully.\",\n    \"data\": {\n        \"id\": 3,\n        \"board_id\": 1,\n        \"name\": \"In Progress\",\n        \"created_at\": \"2025-07-15T11:00:00.000000Z\",\n        \"updated_at\": \"2025-07-15T11:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — insufficient role |\n| `422` | Validation error — name is missing or invalid |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to create lists.\",\n    \"errors\": {}\n}\n\n ```\n\n**422 Validation Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed.\",\n    \"errors\": {\n        \"name\": [\"The name field is required.\"]\n    }\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Lists belong to a board and are used to categorize tasks.\n    \n- Common list names: `To Do`, `In Progress`, `In Review`, `Done`.\n    \n- Only `manager` and `team_lead` roles can create lists."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Lists of a Board",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            },
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists"
+              ]
+            },
+            "description": "## 📋 Get All Lists of a Board\n\nRetrieves all lists associated with a specific board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boards/{{board_id}}/lists` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Lists retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"board_id\": 1,\n            \"name\": \"To Do\",\n            \"created_at\": \"2025-07-15T09:45:00.000000Z\",\n            \"updated_at\": \"2025-07-15T09:45:00.000000Z\"\n        },\n        {\n            \"id\": 2,\n            \"board_id\": 1,\n            \"name\": \"In Progress\",\n            \"created_at\": \"2025-07-15T11:00:00.000000Z\",\n            \"updated_at\": \"2025-07-15T11:00:00.000000Z\"\n        },\n        {\n            \"id\": 3,\n            \"board_id\": 1,\n            \"name\": \"Done\",\n            \"created_at\": \"2025-07-15T11:05:00.000000Z\",\n            \"updated_at\": \"2025-07-15T11:05:00.000000Z\"\n        }\n    ]\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `404` | Board not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view this board's lists.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns all lists for the specified board in creation order.\n    \n- All board members can view lists.\n    \n- An empty array `[]` is returned if no lists have been created yet."
+          },
+          "response": []
+        },
+        {
+          "name": "Update List of Board",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\" : \"Completed\",\n    \"position\" : 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}"
+              ]
+            },
+            "description": "## ✏️ Update List\n\nUpdates the name of an existing list on a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `PUT` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**Required Role:** `manager` or `team_lead`\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list to update |\n\n---\n\n### Request Body\n\n| Field | Type | Required | Description | Validation Rules |\n| --- | --- | --- | --- | --- |\n| `name` | string | ✅ Yes | The updated name of the list | `required`, `string`, `max:255` |\n\n**Example Request Body:**\n\n``` json\n{\n    \"name\": \"Under Review\"\n}\n\n ```\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"List updated successfully.\",\n    \"data\": {\n        \"id\": 2,\n        \"board_id\": 1,\n        \"name\": \"Under Review\",\n        \"created_at\": \"2025-07-15T11:00:00.000000Z\",\n        \"updated_at\": \"2025-07-15T13:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — insufficient role |\n| `404` | List not found on this board |\n| `422` | Validation error — name is missing or invalid |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to update this list.\",\n    \"errors\": {}\n}\n\n ```\n\n**422 Validation Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed.\",\n    \"errors\": {\n        \"name\": [\"The name field is required.\"]\n    }\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Only the list name can be updated.\n    \n- Only `manager` and `team_lead` roles can update lists.\n    \n- The `list_id` must belong to the specified `board_id`."
+          },
+          "response": []
+        },
+        {
+          "name": "Get a List of a Board",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}"
+              ]
+            },
+            "description": "## 🔍 Get a List\n\nRetrieves the details of a specific list on a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"List retrieved successfully.\",\n    \"data\": {\n        \"id\": 2,\n        \"board_id\": 1,\n        \"name\": \"In Progress\",\n        \"tasks\": [\n            {\n                \"id\": 4,\n                \"title\": \"Design landing page\",\n                \"assigned_to\": 7\n            }\n        ],\n        \"created_at\": \"2025-07-15T11:00:00.000000Z\",\n        \"updated_at\": \"2025-07-15T11:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `404` | List not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view this list.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns list details along with its associated tasks.\n    \n- All board members can view list details.\n    \n- The `list_id` must belong to the specified `board_id`."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a List of a Board",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}"
+              ]
+            },
+            "description": "## 🗑️ Delete a List\n\nPermanently deletes a list and all its associated tasks from a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `DELETE` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**Required Role:** `manager` or `team_lead`\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list to delete |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `204 No Content`\n\n> No response body is returned on successful deletion. \n  \n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — insufficient role |\n| `404` | List not found on this board |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to delete this list.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- ⚠️ **This action is irreversible.** Deleting a list will cascade-delete all tasks and comments within it.\n    \n- Only `manager` and `team_lead` roles can delete lists.\n    \n- A `204 No Content` response with no body is returned on success."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Add a task to a list in a board",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"assigned_to\" : 2,\n    \"name\" : \"Setup Footer\",\n    \"description\" : \"fregdvrgerf\",\n    \"priority\" : \"High\",\n    \"due_date\" : \"2026-03-30\",\n    \"position\" : 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}",
+                "tasks"
+              ]
+            },
+            "description": "## ✅ Add a Task\n\nCreates a new task within a specific list on a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `POST` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**Required Role:** `manager` or `team_lead`\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list |\n\n---\n\n### Request Body\n\n| Field | Type | Required | Description | Validation Rules |\n| --- | --- | --- | --- | --- |\n| `title` | string | ✅ Yes | The title of the task | `required`, `string`, `max:255` |\n| `description` | string | ❌ No | Detailed description of the task | `nullable`, `string` |\n| `assigned_to` | integer | ❌ No | User ID of the assignee | `nullable`, `integer`, `exists:users,id` |\n| `due_date` | date | ❌ No | The deadline for the task | `nullable`, `date`, `after:today` |\n| `priority` | string | ❌ No | Priority level of the task | `nullable`, `in:low,medium,high` |\n\n**Example Request Body:**\n\n``` json\n{\n    \"title\": \"Design the onboarding flow\",\n    \"description\": \"Create wireframes and mockups for the new user onboarding experience.\",\n    \"assigned_to\": 7,\n    \"due_date\": \"2025-08-01\",\n    \"priority\": \"high\"\n}\n\n ```\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `201 Created`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Task created successfully.\",\n    \"data\": {\n        \"id\": 5,\n        \"board_id\": 1,\n        \"list_id\": 2,\n        \"title\": \"Design the onboarding flow\",\n        \"description\": \"Create wireframes and mockups for the new user onboarding experience.\",\n        \"assigned_to\": 7,\n        \"due_date\": \"2025-08-01\",\n        \"priority\": \"high\",\n        \"created_by\": 3,\n        \"created_at\": \"2025-07-15T12:00:00.000000Z\",\n        \"updated_at\": \"2025-07-15T12:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — insufficient role |\n| `422` | Validation error — required fields missing or invalid |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to create tasks.\",\n    \"errors\": {}\n}\n\n ```\n\n**422 Validation Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed.\",\n    \"errors\": {\n        \"title\": [\"The title field is required.\"],\n        \"due_date\": [\"The due date must be a date after today.\"]\n    }\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Tasks must belong to a list, which must belong to the specified board.\n    \n- The `assigned_to` user must be a member of the board.\n    \n- Valid priority values: `low`, `medium`, `high`.\n    \n- The `created_by` field is automatically set to the authenticated user's ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update a task in a list of a board",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"assigned_to\" : 3,\n    \"name\" : \"Started Design\",\n    \"description\" : \"fregdvrgerf\",\n    \"priority\" : \"High\",\n    \"due_date\" : \"2026-03-30\",\n    \"position\" : 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}",
+                "tasks",
+                "{{task_id}}"
+              ]
+            },
+            "description": "## ✏️ Update a Task\n\nUpdates the details of an existing task within a list on a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `PUT` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**Required Role:** `manager` or `team_lead`\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list |\n| `task_id` | integer | The unique ID of the task to update |\n\n---\n\n### Request Body\n\n| Field | Type | Required | Description | Validation Rules |\n| --- | --- | --- | --- | --- |\n| `title` | string | ✅ Yes | Updated title of the task | `required`, `string`, `max:255` |\n| `description` | string | ❌ No | Updated description | `nullable`, `string` |\n| `assigned_to` | integer | ❌ No | Updated assignee user ID | `nullable`, `integer`, `exists:users,id` |\n| `due_date` | date | ❌ No | Updated deadline | `nullable`, `date` |\n| `priority` | string | ❌ No | Updated priority level | `nullable`, `in:low,medium,high` |\n\n**Example Request Body:**\n\n``` json\n{\n    \"title\": \"Design the onboarding flow - v2\",\n    \"description\": \"Revised wireframes incorporating feedback from the design review.\",\n    \"assigned_to\": 9,\n    \"due_date\": \"2025-08-10\",\n    \"priority\": \"medium\"\n}\n\n ```\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Task updated successfully.\",\n    \"data\": {\n        \"id\": 5,\n        \"board_id\": 1,\n        \"list_id\": 2,\n        \"title\": \"Design the onboarding flow - v2\",\n        \"description\": \"Revised wireframes incorporating feedback from the design review.\",\n        \"assigned_to\": 9,\n        \"due_date\": \"2025-08-10\",\n        \"priority\": \"medium\",\n        \"created_by\": 3,\n        \"created_at\": \"2025-07-15T12:00:00.000000Z\",\n        \"updated_at\": \"2025-07-15T14:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — insufficient role |\n| `404` | Task not found |\n| `422` | Validation error |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to update this task.\",\n    \"errors\": {}\n}\n\n ```\n\n**422 Validation Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed.\",\n    \"errors\": {\n        \"title\": [\"The title field is required.\"]\n    }\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- The task must belong to the specified list and board.\n    \n- Only `manager` and `team_lead` roles can update tasks.\n    \n- To move a task to a different list, update the `list_id` if supported by the API."
+          },
+          "response": []
+        },
+        {
+          "name": "View all task of a list in a board",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}",
+                "tasks"
+              ]
+            },
+            "description": "## 📋 View All Tasks of a List\n\nRetrieves all tasks within a specific list on a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Tasks retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 4,\n            \"board_id\": 1,\n            \"list_id\": 2,\n            \"title\": \"Design landing page\",\n            \"description\": \"Create a responsive landing page design.\",\n            \"assigned_to\": 7,\n            \"due_date\": \"2025-07-30\",\n            \"priority\": \"high\",\n            \"created_by\": 3,\n            \"created_at\": \"2025-07-14T08:00:00.000000Z\",\n            \"updated_at\": \"2025-07-14T08:00:00.000000Z\"\n        },\n        {\n            \"id\": 5,\n            \"board_id\": 1,\n            \"list_id\": 2,\n            \"title\": \"Design the onboarding flow\",\n            \"description\": \"Create wireframes for the onboarding experience.\",\n            \"assigned_to\": 7,\n            \"due_date\": \"2025-08-01\",\n            \"priority\": \"high\",\n            \"created_by\": 3,\n            \"created_at\": \"2025-07-15T12:00:00.000000Z\",\n            \"updated_at\": \"2025-07-15T12:00:00.000000Z\"\n        }\n    ]\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `404` | List or board not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view tasks on this board.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns all tasks within the specified list.\n    \n- All board members can view tasks.\n    \n- An empty array `[]` is returned if no tasks exist in the list."
+          },
+          "response": []
+        },
+        {
+          "name": "View a task of a list in a board",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}",
+                "tasks",
+                "{{task_id}}"
+              ]
+            },
+            "description": "## 🔍 View a Task\n\nRetrieves the full details of a specific task within a list on a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list |\n| `task_id` | integer | The unique ID of the task |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Task retrieved successfully.\",\n    \"data\": {\n        \"id\": 5,\n        \"board_id\": 1,\n        \"list_id\": 2,\n        \"title\": \"Design the onboarding flow\",\n        \"description\": \"Create wireframes and mockups for the new user onboarding experience.\",\n        \"assigned_to\": 7,\n        \"due_date\": \"2025-08-01\",\n        \"priority\": \"high\",\n        \"created_by\": 3,\n        \"comments\": [\n            {\n                \"id\": 1,\n                \"user_id\": 7,\n                \"body\": \"Started working on the wireframes.\",\n                \"created_at\": \"2025-07-16T09:00:00.000000Z\"\n            }\n        ],\n        \"created_at\": \"2025-07-15T12:00:00.000000Z\",\n        \"updated_at\": \"2025-07-15T12:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `404` | Task not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view this task.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns full task details including associated comments.\n    \n- All board members can view task details.\n    \n- The `task_id` must belong to the specified `list_id` and `board_id`."
+          },
+          "response": []
+        },
+        {
+          "name": "View all tasks of a board",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/boardtasks/{{board_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boardtasks",
+                "{{board_id}}"
+              ]
+            },
+            "description": "## 📋 View All Tasks of a Board\n\nRetrieves all tasks associated with a specific board, across all its lists.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boardtasks/{{board_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board whose tasks are to be retrieved |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Tasks retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"title\": \"Design landing page\",\n            \"description\": \"Create wireframes and mockups for the new landing page.\",\n            \"status\": \"in_progress\",\n            \"list_id\": 2,\n            \"board_id\": 1,\n            \"assigned_to\": 5,\n            \"created_at\": \"2025-07-15T10:00:00.000000Z\",\n            \"updated_at\": \"2025-07-16T08:30:00.000000Z\"\n        },\n        {\n            \"id\": 2,\n            \"title\": \"Set up CI/CD pipeline\",\n            \"description\": \"Configure GitHub Actions for automated deployments.\",\n            \"status\": \"todo\",\n            \"list_id\": 1,\n            \"board_id\": 1,\n            \"assigned_to\": 3,\n            \"created_at\": \"2025-07-15T11:00:00.000000Z\",\n            \"updated_at\": \"2025-07-15T11:00:00.000000Z\"\n        }\n    ]\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `404` | Board not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view this board.\",\n    \"errors\": {}\n}\n\n ```\n\n**404 Not Found:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Board not found.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns all tasks belonging to the specified board, regardless of which list they are in.\n    \n- Only users who are members of the board can access this endpoint.\n    \n- An empty array `[]` is returned if the board has no tasks.\n    \n- The `list_id` field indicates which list within the board the task belongs to."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a task of a list of a board",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}",
+                "tasks",
+                "{{task_id}}"
+              ]
+            },
+            "description": "## 🗑️ Delete a Task of a List of a Board\n\nPermanently deletes a specific task from a list within a board.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `DELETE` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list within the board |\n| `task_id` | integer | The unique ID of the task to delete |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `204 No Content`\n\n> No response body is returned on successful deletion.\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user does not have permission to delete this task |\n| `404` | Board, list, or task not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to delete this task.\",\n    \"errors\": {}\n}\n\n ```\n\n**404 Not Found:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Task not found.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- ⚠️ **This action is irreversible.** Deleting a task will also remove all associated comments and activity logs.\n    \n- The task must belong to the specified list, which must belong to the specified board.\n    \n- A `204 No Content` response with no body is returned on success."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Add Comment to a task",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"body\" : \"About to finish, need one more day\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}/comments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}",
+                "tasks",
+                "{{task_id}}",
+                "comments"
+              ]
+            },
+            "description": "## 💬 Add Comment to a Task\n\nAdds a new comment to a specific task.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `POST` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}/comments` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list |\n| `task_id` | integer | The unique ID of the task |\n\n---\n\n### Request Body\n\n| Field | Type | Required | Description | Validation Rules |\n| --- | --- | --- | --- | --- |\n| `body` | string | ✅ Yes | The content of the comment | `required`, `string` |\n\n**Example Request Body:**\n\n``` json\n{\n    \"body\": \"I've completed the initial wireframes. Please review and provide feedback by EOD.\"\n}\n\n ```\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `201 Created`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Comment added successfully.\",\n    \"data\": {\n        \"id\": 3,\n        \"task_id\": 5,\n        \"user_id\": 7,\n        \"body\": \"I've completed the initial wireframes. Please review and provide feedback by EOD.\",\n        \"user\": {\n            \"id\": 7,\n            \"name\": \"Bob Martinez\"\n        },\n        \"created_at\": \"2025-07-16T10:00:00.000000Z\",\n        \"updated_at\": \"2025-07-16T10:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `422` | Validation error — body is missing |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to comment on this task.\",\n    \"errors\": {}\n}\n\n ```\n\n**422 Validation Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed.\",\n    \"errors\": {\n        \"body\": [\"The body field is required.\"]\n    }\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- All board members can add comments to tasks.\n    \n- The `user_id` is automatically set to the authenticated user's ID.\n    \n- Comments support plain text only (no markdown or HTML)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get all comments of a task",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}/comments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}",
+                "tasks",
+                "{{task_id}}",
+                "comments"
+              ]
+            },
+            "description": "## 💬 Get All Comments of a Task\n\nRetrieves all comments associated with a specific task.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}/comments` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list |\n| `task_id` | integer | The unique ID of the task |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Comments retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"task_id\": 5,\n            \"user_id\": 7,\n            \"body\": \"Started working on the wireframes.\",\n            \"user\": {\n                \"id\": 7,\n                \"name\": \"Bob Martinez\"\n            },\n            \"created_at\": \"2025-07-16T09:00:00.000000Z\",\n            \"updated_at\": \"2025-07-16T09:00:00.000000Z\"\n        },\n        {\n            \"id\": 3,\n            \"task_id\": 5,\n            \"user_id\": 7,\n            \"body\": \"I've completed the initial wireframes. Please review and provide feedback by EOD.\",\n            \"user\": {\n                \"id\": 7,\n                \"name\": \"Bob Martinez\"\n            },\n            \"created_at\": \"2025-07-16T10:00:00.000000Z\",\n            \"updated_at\": \"2025-07-16T10:00:00.000000Z\"\n        }\n    ]\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `404` | Task not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view comments on this task.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns all comments in chronological order (oldest first).\n    \n- All board members can view comments.\n    \n- An empty array `[]` is returned if no comments exist."
+          },
+          "response": []
+        },
+        {
+          "name": "Get a comment on a task",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}/comments/{{comment_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}",
+                "tasks",
+                "{{task_id}}",
+                "comments",
+                "{{comment_id}}"
+              ]
+            },
+            "description": "## 🔍 Get a Comment\n\nRetrieves the details of a specific comment on a task.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}/comments/{{comment_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list |\n| `task_id` | integer | The unique ID of the task |\n| `comment_id` | integer | The unique ID of the comment |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Comment retrieved successfully.\",\n    \"data\": {\n        \"id\": 3,\n        \"task_id\": 5,\n        \"user_id\": 7,\n        \"body\": \"I've completed the initial wireframes. Please review and provide feedback by EOD.\",\n        \"user\": {\n            \"id\": 7,\n            \"name\": \"Bob Martinez\",\n            \"email\": \"bob@example.com\"\n        },\n        \"created_at\": \"2025-07-16T10:00:00.000000Z\",\n        \"updated_at\": \"2025-07-16T10:00:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not a member of this board |\n| `404` | Comment not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view this comment.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Returns the comment along with the author's user details.\n    \n- All board members can view individual comments.\n    \n- The `comment_id` must belong to the specified `task_id`."
+          },
+          "response": []
+        },
+        {
+          "name": "Update a comment of a task",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"body\": \"I will start arranging dashboard\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}/comments/{{comment_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}",
+                "tasks",
+                "{{task_id}}",
+                "comments",
+                "{{comment_id}}"
+              ]
+            },
+            "description": "## ✏️ Update a Comment\n\nUpdates the content of an existing comment on a task.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `PUT` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}/comments/{{comment_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list |\n| `task_id` | integer | The unique ID of the task |\n| `comment_id` | integer | The unique ID of the comment to update |\n\n---\n\n### Request Body\n\n| Field | Type | Required | Description | Validation Rules |\n| --- | --- | --- | --- | --- |\n| `body` | string | ✅ Yes | The updated content of the comment | `required`, `string` |\n\n**Example Request Body:**\n\n``` json\n{\n    \"body\": \"Wireframes are complete and have been shared in the design folder. Awaiting approval.\"\n}\n\n ```\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Comment updated successfully.\",\n    \"data\": {\n        \"id\": 3,\n        \"task_id\": 5,\n        \"user_id\": 7,\n        \"body\": \"Wireframes are complete and have been shared in the design folder. Awaiting approval.\",\n        \"user\": {\n            \"id\": 7,\n            \"name\": \"Bob Martinez\"\n        },\n        \"created_at\": \"2025-07-16T10:00:00.000000Z\",\n        \"updated_at\": \"2025-07-16T11:30:00.000000Z\"\n    }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not the comment author |\n| `404` | Comment not found |\n| `422` | Validation error — body is missing |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You can only edit your own comments.\",\n    \"errors\": {}\n}\n\n ```\n\n**422 Validation Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Validation failed.\",\n    \"errors\": {\n        \"body\": [\"The body field is required.\"]\n    }\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Users can only update their own comments.\n    \n- The `updated_at` timestamp is refreshed on every update.\n    \n- Comment history/versioning is not tracked."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a comment of a task",
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "accept": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}/comments/{{comment_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "boards",
+                "{{board_id}}",
+                "lists",
+                "{{list_id}}",
+                "tasks",
+                "{{task_id}}",
+                "comments",
+                "{{comment_id}}"
+              ]
+            },
+            "description": "## 🗑️ Delete a Comment\n\nPermanently deletes a comment from a task.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `DELETE` | `{{base_url}}/boards/{{board_id}}/lists/{{list_id}}/tasks/{{task_id}}/comments/{{comment_id}}` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### URL Parameters\n\n| Parameter | Type | Description |\n| --- | --- | --- |\n| `board_id` | integer | The unique ID of the board |\n| `list_id` | integer | The unique ID of the list |\n| `task_id` | integer | The unique ID of the task |\n| `comment_id` | integer | The unique ID of the comment to delete |\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `204 No Content`\n\n> No response body is returned on successful deletion. \n  \n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `403` | Forbidden — user is not the comment author or a manager |\n| `404` | Comment not found |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to delete this comment.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Users can delete their own comments. Managers can delete any comment.\n    \n- This action is irreversible.\n    \n- A `204 No Content` response with no body is returned on success."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "item": [
+        {
+          "name": "Get ActivityLogs",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/logs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "logs"
+              ]
+            },
+            "description": "## 📊 Get Activity Logs\n\nRetrieves a chronological log of all activities performed within the system, such as board creation, task assignments, and member changes.\n\n---\n\n### Endpoint\n\n| Method | URL |\n| --- | --- |\n| `GET` | `{{base_url}}/logs` |\n\n---\n\n### 🔐 Authentication\n\nRequires a valid Bearer token.\n\n```\nAuthorization: Bearer {{token}\n\n ```\n\n---\n\n### Request Body\n\nNo request body required.\n\n---\n\n### ✅ Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n    \"status\": true,\n    \"message\": \"Activity logs retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"user_id\": 3,\n            \"action\": \"created_board\",\n            \"description\": \"Created board 'Product Launch Q3'\",\n            \"loggable_type\": \"App\\\\Models\\\\Board\",\n            \"loggable_id\": 1,\n            \"user\": {\n                \"id\": 3,\n                \"name\": \"Sarah Connor\"\n            },\n            \"created_at\": \"2025-07-15T09:30:00.000000Z\"\n        },\n        {\n            \"id\": 2,\n            \"user_id\": 3,\n            \"action\": \"added_member\",\n            \"description\": \"Added Bob Martinez as team_lead to board 'Product Launch Q3'\",\n            \"loggable_type\": \"App\\\\Models\\\\BoardMember\",\n            \"loggable_id\": 12,\n            \"user\": {\n                \"id\": 3,\n                \"name\": \"Sarah Connor\"\n            },\n            \"created_at\": \"2025-07-15T10:00:00.000000Z\"\n        },\n        {\n            \"id\": 3,\n            \"user_id\": 7,\n            \"action\": \"created_task\",\n            \"description\": \"Created task 'Design the onboarding flow' in list 'In Progress'\",\n            \"loggable_type\": \"App\\\\Models\\\\Task\",\n            \"loggable_id\": 5,\n            \"user\": {\n                \"id\": 7,\n                \"name\": \"Bob Martinez\"\n            },\n            \"created_at\": \"2025-07-15T12:00:00.000000Z\"\n        }\n    ]\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n| Status Code | Description |\n| --- | --- |\n| `401` | Unauthenticated — token missing or invalid |\n| `500` | Internal server error |\n\n**401 Unauthenticated:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Unauthenticated.\",\n    \"errors\": {}\n}\n\n ```\n\n**403 Forbidden:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"You do not have permission to view activity logs.\",\n    \"errors\": {}\n}\n\n ```\n\n**500 Internal Server Error:**\n\n``` json\n{\n    \"status\": false,\n    \"message\": \"Something went wrong.\",\n    \"errors\": {}\n}\n\n ```\n\n---\n\n### 📝 Notes\n\n- Logs are returned in reverse chronological order (newest first).\n    \n- Logs are immutable — they cannot be edited or deleted via the API.\n    \n- The `subject_model` and subject`_id` fields implement Laravel's polymorphic relationships, indicating which model the log entry refers to."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
