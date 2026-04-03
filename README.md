@@ -117,7 +117,7 @@ A professional task management REST API built with **Laravel 13** and **MySQL**,
 
 | Method | Endpoint                       | Description        | Role    |
 | ------ | ------------------------------ | ------------------ | ------- |
-| GET    | `/api/boards/{board}/activity` | Get board activity | Member+ |
+| GET    | `/api/boards/{board}/logs` | Get board activity | Member+ |
 
 ---
 
