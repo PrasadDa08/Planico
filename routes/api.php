@@ -27,6 +27,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('boards.lists.tasks', TaskController::class);
     Route::get('/boardtasks/{board}', [TaskController::class, 'boardTasks']);
     Route::apiResource('boards.lists.tasks.comments', CommentController::class);
-    Route::get('/logs', [ActivityLogController::class, 'logs']);
+    Route::get('/boards/{board}/logs', [ActivityLogController::class, 'logs']);
 });
-

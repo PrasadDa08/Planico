@@ -106,5 +106,11 @@ class BoardPolicy
          return ($isManager || $ownerCheck);
     }
 
+    // Policies for Activitylog
+
+    public function viewLog(User $user, Board $board){
+        return $board->members('user_id', $user->id)->exists();
+    }
+
 
 }
